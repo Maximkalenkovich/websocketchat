@@ -5,44 +5,24 @@ import {io} from "socket.io-client";
 
 
 
-const arrMessage = [
-    { message: "test", id: '4564', user: { id: '234234we', name: "Dima" } },
-    { message: "hello pedik", id: 'wsfwe32', user: { id: 'wefwe43', name: "mAX" } }
-];
+
 const newSocket = io('http://localhost:3009');
 
 function App() {
-    const [messages, setMessages] = useState(arrMessage);
-    const [messag, setMessag] = useState('');
+
 
     useEffect(() => {
-        newSocket.on('connect', () => {
-            console.log('Connected to the server');
-        });
-
-        newSocket.on('message', (message) => {
-            console.log('Received message:', message);
-            setMessages((prevMessages) => [...prevMessages, { message, id: Date.now().toString(), user: { id: 'server', name: 'Server' } }]);
-        });
-
-        newSocket.on('disconnect', () => {
-            console.log('Disconnected from the server');
-        });
-
-        return () => {
-            newSocket.off('connect');
-            newSocket.off('message');
-            newSocket.off('disconnect');
-        };
+        newSocket.on('initial messages', (messages:any) => {
+            setMessages(messages)
+        })
     }, []);
 
-    const handleSendMessage = () => {
-        if (messag.trim()) {
-            newSocket.emit('message', messag);
-            setMessages([...messages, { message: messag, id: Date.now().toString(), user: { id: 'user', name: 'You' } }]);
-            setMessag('');
-        }
-    };
+
+    const [messages, setMessages] = useState<Array<any>>([]);
+    const [message, setMessage] = useState('');
+
+
+
 
     return (
         <div className="App">
@@ -59,13 +39,47 @@ function App() {
             <div className={s.inputGroup}>
         <textarea
             className={s.input}
-            value={messag}
-            onChange={(e) => setMessag(e.currentTarget.value)}
+            value={message}
+            onChange={(e) => setMessage(e.currentTarget.value)}
         />
-                <button className={s.buttons} onClick={handleSendMessage}>отправить</button>
+                <button className={s.buttons} onClick={() => newSocket.emit('message', message)}>отправить</button>
             </div>
         </div>
     );
 }
 
 export default App;
+
+
+
+
+
+
+// useEffect(() => {
+//     newSocket.on('connect', () => {
+//         console.log('Connected to the server');
+//     });
+//
+//     newSocket.on('message', (message) => {
+//         console.log('Received message:', message);
+//         setMessages((prevMessages) => [...prevMessages, { message, id: Date.now().toString(), user: { id: 'server', name: 'Server' } }]);
+//     });
+//
+//     newSocket.on('disconnect', () => {
+//         console.log('Disconnected from the server');
+//     });
+//
+//     return () => {
+//         newSocket.off('connect');
+//         newSocket.off('message');
+//         newSocket.off('disconnect');
+//     };
+// }, []);
+
+// const handleSendMessage = () => {
+//     if (messag.trim()) {
+//         newSocket.emit('message', messag);
+//         setMessages([...messages, { message: messag, id: Date.now().toString(), user: { id: 'user', name: 'You' } }]);
+//         setMessag('');
+//     }
+// };
